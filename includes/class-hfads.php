@@ -158,6 +158,8 @@ class Hfads {
 		$this->loader->add_action(	'after_setup_theme',				$admin, 'crb_load', 				10);
 		$this->loader->add_action( 	'carbon_fields_register_fields', 	$admin, 'set_floating_ad_options', 	10);
 		$this->loader->add_action( 	'carbon_fields_register_fields', 	$admin, 'set_page_options', 		20);
+		$this->loader->add_action(	'wp_ajax_hfads-set-cookie',			$admin, 'set_cookie');
+		$this->loader->add_action(	'wp_ajax_nopriv_hfads-set-cookie',	$admin, 'set_cookie');
 
 	}
 

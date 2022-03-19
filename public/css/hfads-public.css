@@ -9,3 +9,20 @@
     background-color: white;
     z-index: 999;
 }
+
+.hfads-holder .hfads-closing {
+    display: block;
+    position: absolute;
+    right: 32px;
+    border: 2px solid black;
+    border-radius: 16px;
+    padding: 4px;
+}
+
+.hfads-header .hfads-closing {
+    bottom: 0;
+}
+
+.hfads-footer .hfads-closing {
+    top: 0;
+}

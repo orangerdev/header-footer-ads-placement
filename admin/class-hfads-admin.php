@@ -202,5 +202,40 @@ class Admin {
 
 	}
 
+	/**
+	 * Set cookie
+	 */
+	public function set_cookie() {
+
+		$post_data = wp_parse_args($_POST, array(
+							'target' => NULL
+						));
+
+		if(
+			!empty($post_data['target']) &&
+			in_array( $post_data['target'], array('header', 'footer'))
+		) :
+
+			$key = 'hfads_display';
+
+			$set = array(
+				'header'	=> false,
+				'footer'	=> false
+			);
+
+			if(isset($_COOKIE[$key])) :
+				$set = wp_parse_args(
+							maybe_unserialize(stripslashes_deep($_COOKIE[$key])),
+							$set
+					   );
+			endif;
+
+			$set[$post_data['target']] = true;
+
+			$cookie = setcookie( $key, serialize($set), 0, COOKIEPATH, COOKIE_DOMAIN);
+		endif;
+
+		exit;
+	}
 
 }

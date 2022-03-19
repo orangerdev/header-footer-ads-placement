@@ -136,10 +136,27 @@ class Front {
 
 		if(is_page()) :
 
+			$cookie = array(
+							'header'	=> false,
+							'footer'	=> false
+						);
+
+			$key = 'hfads_display';
+
+			if(isset($_COOKIE[$key])) :
+				$cookie = wp_parse_args(
+							maybe_unserialize(stripslashes_deep($_COOKIE[$key])),
+							$cookie
+						  );
+			endif;
+
 			$header_ad = absint(carbon_get_post_meta($post->ID, 'hfads_header'));
 			$footer_ad = absint(carbon_get_post_meta($post->ID, 'hfads_footer'));
 
-			if(0 < $header_ad) :
+			if(
+				0 < $header_ad &&
+				false === $cookie['header']
+			) :
 
 				$ad_setting = $this->get_ad( $header_ad );
 
@@ -149,7 +166,10 @@ class Front {
 
 			endif;
 
-			if(0 < $footer_ad) :
+			if(
+				0 < $footer_ad &&
+				false === $cookie['footer']
+			) :
 
 				$ad_setting = $this->get_ad( $footer_ad, 'footer' );
 
@@ -229,7 +249,13 @@ class Front {
 			array_key_exists('footer', $this->floating_ads)
 		) :
 
-			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/hfads-public.js', array( 'jquery' ), $this->version, false );
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/hfads-public.js', array( 'jquery' ), $this->version, true );
+
+			wp_localize_script( $this->plugin_name, 'hfads', array(
+				'url'	=> add_query_arg(array(
+							'action'	=> 'hfads-set-cookie'
+						   ), admin_url('admin-ajax.php'))
+			));
 
 		endif;
 
@@ -268,6 +294,9 @@ class Front {
 			?>
 			<div class='hfads-header hfads-header-<?= $post->ID ; ?> hfads-holder' >
 				<?= do_shortcode( $this->floating_ads['header']['shortcode']); ?>
+				<a href='#' class='hfads-closing' data-target='header'>
+					<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAcklEQVQ4jc2SQQ6AIAwER1/A44SDPlNeJyZ6qQkhbT30oHuju2yXUvgTElCB7GiyaJJGVuACGlAUvgh3Abvl/ghGkzJwZsoFOER4ApvUWldbrctWNyuViz6J23l2TKaXs4nQE7SBaYNVEf7G8CKFV/kb3OR9P1Xog/cZAAAAAElFTkSuQmCC"/>
+				</a>
 			</div>
 			<?php
 		endif;
@@ -276,6 +305,9 @@ class Front {
 			?>
 			<div class='hfads-footer hfads-footer-<?= $post->ID ; ?> hfads-holder'>
 				<?= do_shortcode( $this->floating_ads['footer']['shortcode']); ?>
+				<a href='#' class='hfads-closing' data-target='footer'>
+					<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAcklEQVQ4jc2SQQ6AIAwER1/A44SDPlNeJyZ6qQkhbT30oHuju2yXUvgTElCB7GiyaJJGVuACGlAUvgh3Abvl/ghGkzJwZsoFOER4ApvUWldbrctWNyuViz6J23l2TKaXs4nQE7SBaYNVEf7G8CKFV/kb3OR9P1Xog/cZAAAAAElFTkSuQmCC"/>
+				</a>
 			</div>
 			<?php
 		endif;
