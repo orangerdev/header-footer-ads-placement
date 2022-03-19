@@ -170,10 +170,12 @@ class Hfads {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new HFAds\Front( $this->get_plugin_name(), $this->get_version() );
+		$front = new HFAds\Front( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'template_redirect',		$front,	'check_floating_ads');
+		$this->loader->add_action( 'wp_enqueue_scripts', 	$front, 'enqueue_styles' );
+		$this->loader->add_action( 'wp_enqueue_scripts', 	$front, 'enqueue_scripts' );
+		$this->loader->add_action( 'wp_footer',				$front, 'display_floating_ads');
 
 	}
 

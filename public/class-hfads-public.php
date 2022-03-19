@@ -43,6 +43,14 @@ class Front {
 	private $version;
 
 	/**
+	 * Floatig ads
+	 *
+	 * @since 	1.0.0
+	 * @var 	array
+	 */
+	protected $floating_ads = array();
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -57,25 +65,143 @@ class Front {
 	}
 
 	/**
+	 * Get ad data
+	 * @since 	1.0.0
+	 * @param  	integer 	$ad_id
+	 * @param 	string 		$type
+	 * @return 	array|null
+	 * - shortcode 	( string )
+	 * - height 	( integer )
+	 */
+	protected function get_ad( $ad_id, $type = 'header' ) {
+
+		$ad = null;
+
+		if(wp_is_mobile()) :
+
+			$margin = absint( carbon_get_post_meta( $ad_id, 'mobile_margin') );
+			$height = absint( carbon_get_post_meta( $ad_id, 'mobile_size') );
+
+			if( 'header' === $type && is_admin_bar_showing()) :
+				$margin = $margin + 32;
+			endif;
+
+			$ad = array(
+				'shortcode'	=> carbon_get_post_meta( $ad_id, 'mobile_shortcode'),
+				'height'	=> $height . 'px',
+				'margin'	=> $margin . 'px',
+				'body'		=> ( $height + $margin ) . 'px'
+			);
+		else :
+
+			$margin = absint( carbon_get_post_meta( $ad_id, 'mobile_margin') );
+			$height = absint( carbon_get_post_meta( $ad_id, 'desktop_size') );
+
+			if( 'header' === $type && is_admin_bar_showing()) :
+				$margin = $margin + 32;
+			endif;
+
+			$ad = array(
+				'shortcode'	=> carbon_get_post_meta( $ad_id, 'desktop_shortcode'),
+				'height'	=> $height . 'px',
+				'margin'	=> $margin . 'px',
+				'body'		=> ( $height + $margin ) . 'px'
+			);
+		endif;
+
+		return $ad;
+	}
+
+	/**
+	 * Check if current page has floating ads
+	 * Hooked via action template_redirect, priority 10
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	public function check_floating_ads() {
+
+		global $post;
+
+		if(is_page()) :
+
+			$header_ad = absint(carbon_get_post_meta($post->ID, 'hfads_header'));
+			$footer_ad = absint(carbon_get_post_meta($post->ID, 'hfads_footer'));
+
+			if(0 < $header_ad) :
+
+				$ad_setting = $this->get_ad( $header_ad );
+
+				if( is_array( $ad_setting )) :
+					$this->floating_ads['header'] = $ad_setting;
+				endif;
+
+			endif;
+
+			if(0 < $footer_ad) :
+
+				$ad_setting = $this->get_ad( $footer_ad, 'footer' );
+
+				if( is_array( $ad_setting )) :
+					$this->floating_ads['footer'] = $ad_setting;
+				endif;
+
+			endif;
+
+		endif;
+
+	}
+
+	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Hfads_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Hfads_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		global $post;
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/hfads-public.css', array(), $this->version, 'all' );
+		if(
+			array_key_exists('header', $this->floating_ads) ||
+			array_key_exists('footer', $this->floating_ads)
+		) :
+
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/hfads-public.css', array(), $this->version, 'all' );
+
+			ob_start();
+
+			if(array_key_exists('header', $this->floating_ads)) :
+				?>
+				.hfads-header-<?php echo $post->ID; ?> {
+					height: <?php echo $this->floating_ads['header']['height']; ?>;
+					top: <?php echo $this->floating_ads['header']['margin']; ?>;
+				}
+
+				body {
+					margin-top: <?php echo $this->floating_ads['header']['body']; ?> !important;
+				}
+				<?php
+			endif;
+
+			if(array_key_exists('footer', $this->floating_ads)) :
+				?>
+				.hfads-footer-<?php echo $post->ID; ?> {
+					height: <?php echo $this->floating_ads['footer']['height']; ?>;
+					bottom: <?php echo $this->floating_ads['footer']['margin']; ?>;
+				}
+
+				body {
+					margin-bottom: <?php echo $this->floating_ads['footer']['body']; ?> !important;
+				}
+				<?php
+			endif;
+
+			$custom_css = ob_get_contents();
+
+			ob_end_clean();
+
+			wp_add_inline_style( $this->plugin_name, $custom_css );
+
+		endif;
 
 	}
 
@@ -86,20 +212,42 @@ class Front {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Hfads_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Hfads_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		if(
+			array_key_exists('header', $this->floating_ads) ||
+			array_key_exists('footer', $this->floating_ads)
+		) :
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/hfads-public.js', array( 'jquery' ), $this->version, false );
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/hfads-public.js', array( 'jquery' ), $this->version, false );
 
+		endif;
+
+	}
+
+	/**
+	 * Display floating ads
+	 * Hooked via wp_footer, priority 10
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	public function display_floating_ads() {
+
+		global $post;
+
+		if(array_key_exists('header', $this->floating_ads)) :
+			?>
+			<div class='hfads-header hfads-header-<?= $post->ID ; ?>'>
+				<?= do_shortcode( $this->floating_ads['header']['shortcode']); ?>
+			</div>
+			<?php
+		endif;
+
+		if(array_key_exists('footer', $this->floating_ads)) :
+			?>
+			<div class='hfads-footer hfads-footer-<?= $post->ID ; ?>'>
+				<?= do_shortcode( $this->floating_ads['footer']['shortcode']); ?>
+			</div>
+			<?php
+		endif;
 	}
 
 }

@@ -159,20 +159,26 @@ class Admin {
 			->where('post_type', '=', 'floating-ad')
 			->add_fields([
 				Field::make('separator',	'hfads_sep_desktop',	__('Desktop', 'hfads')),
-				Field::make('textarea',		'desktop_shortcode',	__('Shortcode', 'hfads'))
+				Field::make('rich_text',	'desktop_shortcode',	__('Shortcode', 'hfads'))
 					->set_required(true),
 				Field::make('text',			'desktop_size',			__('Height in PX', 'hfads'))
 					->set_required(true)
 					->set_attribute('type', 'number')
 					->set_default_value(100),
+				Field::make('text',			'desktop_margin',		__('Margin in PX', 'hfads'))
+					->set_attribute('type', 'number')
+					->set_default_value(0),
 
 				Field::make('separator',	'hfads_sep_mobile',		__('Mobile', 'hfads')),
-				Field::make('textarea',		'mobile_shortcode',		__('Shortcode', 'hfads'))
+				Field::make('rich_text',	'mobile_shortcode',		__('Shortcode', 'hfads'))
 					->set_required(true),
 				Field::make('text',			'mobile_size',			__('Height in PX', 'hfads'))
 					->set_required(true)
 					->set_attribute('type', 'number')
 					->set_default_value(100),
+				Field::make('text',			'mobile_margin',		__('Margin in PX', 'hfads'))
+					->set_attribute('type', 'number')
+					->set_default_value(0),
 			]);
 	}
 
