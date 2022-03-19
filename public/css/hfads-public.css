@@ -3,8 +3,7 @@
  * included in this file.
  */
 
-.hfads-header,
-.hfads-footer {
+.hfads-holder {
     position: fixed;
     width: 100%;
     background-color: white;

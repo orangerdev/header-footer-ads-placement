@@ -86,26 +86,38 @@ class Front {
 				$margin = $margin + 32;
 			endif;
 
+			if( 'footer' === $type ) :
+				$body = $height;
+			else :
+				$body = $height + $margin;
+			endif;
+
 			$ad = array(
 				'shortcode'	=> carbon_get_post_meta( $ad_id, 'mobile_shortcode'),
 				'height'	=> $height . 'px',
 				'margin'	=> $margin . 'px',
-				'body'		=> ( $height + $margin ) . 'px'
+				'body'		=> $body . 'px'
 			);
 		else :
 
-			$margin = absint( carbon_get_post_meta( $ad_id, 'mobile_margin') );
+			$margin = absint( carbon_get_post_meta( $ad_id, 'desktop_margin') );
 			$height = absint( carbon_get_post_meta( $ad_id, 'desktop_size') );
 
 			if( 'header' === $type && is_admin_bar_showing()) :
 				$margin = $margin + 32;
 			endif;
 
+			if( 'footer' === $type ) :
+				$body = $height;
+			else :
+				$body = $height + $margin;
+			endif;
+
 			$ad = array(
 				'shortcode'	=> carbon_get_post_meta( $ad_id, 'desktop_shortcode'),
 				'height'	=> $height . 'px',
 				'margin'	=> $margin . 'px',
-				'body'		=> ( $height + $margin ) . 'px'
+				'body'		=> $body . 'px'
 			);
 		endif;
 
@@ -176,7 +188,7 @@ class Front {
 					top: <?php echo $this->floating_ads['header']['margin']; ?>;
 				}
 
-				body {
+				body.hfads-header-enable {
 					margin-top: <?php echo $this->floating_ads['header']['body']; ?> !important;
 				}
 				<?php
@@ -189,7 +201,7 @@ class Front {
 					bottom: <?php echo $this->floating_ads['footer']['margin']; ?>;
 				}
 
-				body {
+				body.hfads-header-enable {
 					margin-bottom: <?php echo $this->floating_ads['footer']['body']; ?> !important;
 				}
 				<?php
@@ -224,6 +236,25 @@ class Front {
 	}
 
 	/**
+	 * Modify body classes
+	 * @since 	1.0.0
+	 * @param 	array 	$body_classes
+	 * @return 	array
+	 */
+	public function set_body_classes( array $body_classes ) {
+
+		if(array_key_exists('header', $this->floating_ads)) :
+			$body_classes[]	= 'hfads-header-enable';
+		endif;
+
+		if(array_key_exists('footer', $this->floating_ads)) :
+			$body_classes[]	= 'hfads-footer-enable';
+		endif;
+
+		return $body_classes;
+	}
+
+	/**
 	 * Display floating ads
 	 * Hooked via wp_footer, priority 10
 	 * @since 	1.0.0
@@ -235,7 +266,7 @@ class Front {
 
 		if(array_key_exists('header', $this->floating_ads)) :
 			?>
-			<div class='hfads-header hfads-header-<?= $post->ID ; ?>'>
+			<div class='hfads-header hfads-header-<?= $post->ID ; ?> hfads-holder' >
 				<?= do_shortcode( $this->floating_ads['header']['shortcode']); ?>
 			</div>
 			<?php
@@ -243,7 +274,7 @@ class Front {
 
 		if(array_key_exists('footer', $this->floating_ads)) :
 			?>
-			<div class='hfads-footer hfads-footer-<?= $post->ID ; ?>'>
+			<div class='hfads-footer hfads-footer-<?= $post->ID ; ?> hfads-holder'>
 				<?= do_shortcode( $this->floating_ads['footer']['shortcode']); ?>
 			</div>
 			<?php

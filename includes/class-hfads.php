@@ -175,6 +175,7 @@ class Hfads {
 		$this->loader->add_action( 'template_redirect',		$front,	'check_floating_ads');
 		$this->loader->add_action( 'wp_enqueue_scripts', 	$front, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', 	$front, 'enqueue_scripts' );
+		$this->loader->add_filter( 'body_class',			$front, 'set_body_classes' );
 		$this->loader->add_action( 'wp_footer',				$front, 'display_floating_ads');
 
 	}
