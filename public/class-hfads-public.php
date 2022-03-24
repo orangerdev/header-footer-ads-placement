@@ -199,40 +199,6 @@ class Front {
 
 			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/hfads-public.css', array(), $this->version, 'all' );
 
-			ob_start();
-
-			if(array_key_exists('header', $this->floating_ads)) :
-				?>
-				.hfads-header-<?php echo $post->ID; ?> {
-					height: <?php echo $this->floating_ads['header']['height']; ?>;
-					top: <?php echo $this->floating_ads['header']['margin']; ?>;
-				}
-
-				body.hfads-header-enable {
-					margin-top: <?php echo $this->floating_ads['header']['body']; ?> !important;
-				}
-				<?php
-			endif;
-
-			if(array_key_exists('footer', $this->floating_ads)) :
-				?>
-				.hfads-footer-<?php echo $post->ID; ?> {
-					height: <?php echo $this->floating_ads['footer']['height']; ?>;
-					bottom: <?php echo $this->floating_ads['footer']['margin']; ?>;
-				}
-
-				body.hfads-header-enable {
-					margin-bottom: <?php echo $this->floating_ads['footer']['body']; ?> !important;
-				}
-				<?php
-			endif;
-
-			$custom_css = ob_get_contents();
-
-			ob_end_clean();
-
-			wp_add_inline_style( $this->plugin_name, $custom_css );
-
 		endif;
 
 	}

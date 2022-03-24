@@ -14,13 +14,13 @@
     display: block;
     position: absolute;
     right: 32px;
-    border: 2px solid black;
-    border-radius: 16px;
     padding: 4px;
+    text-shadow: 0 1px 1px #fff;
 }
 
 .hfads-header .hfads-closing {
-    bottom: 0;
+    top: 0;
+    right: 0;
 }
 
 .hfads-footer .hfads-closing {
