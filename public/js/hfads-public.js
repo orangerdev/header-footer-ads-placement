@@ -7,7 +7,7 @@
 			margin = 0;
 
 		if($('body').hasClass('admin-bar')) {
-			margin = 32;
+			margin = $('#wpadminbar').height();
 		}
 
 		if(0 < $('.hfads-header').length) {
@@ -17,8 +17,10 @@
 				top: margin + 'px'
 			});
 
+			console.log(height, margin);
+
 			$('body.hfads-header-enable').css({
-				'margin-top' : ( height + margin ) + 'px'
+				'margin-top' : ( height ) + 'px'
 			})
 		}
 
@@ -52,13 +54,6 @@
 			})
 		}
 
-		$.ajax({
-			url: hfads.url,
-			type: 'POST',
-			data: {
-				target: target
-			}
-		})
 	});
 
 	$(document).on('ready', function(){

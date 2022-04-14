@@ -10,6 +10,24 @@
     z-index: 999;
 }
 
+.hfads-holder .desktop-view {
+    display: block;
+}
+
+.hfads-holder .mobile-view {
+    display: none;
+}
+
+@media screen and (max-width: 480px) {
+    .hfads-holder .desktop-view {
+        display: none;
+    }
+
+    .hfads-holder .mobile-view {
+        display: block;
+    }
+}
+
 .hfads-holder .hfads-closing {
     display: block;
     position: absolute;

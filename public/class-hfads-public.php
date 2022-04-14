@@ -75,51 +75,10 @@ class Front {
 	 */
 	protected function get_ad( $ad_id, $type = 'header' ) {
 
-		$ad = null;
-
-		if(wp_is_mobile()) :
-
-			$margin = absint( carbon_get_post_meta( $ad_id, 'mobile_margin') );
-			$height = absint( carbon_get_post_meta( $ad_id, 'mobile_size') );
-
-			if( 'header' === $type && is_admin_bar_showing()) :
-				$margin = $margin + 32;
-			endif;
-
-			if( 'footer' === $type ) :
-				$body = $height;
-			else :
-				$body = $height + $margin;
-			endif;
-
-			$ad = array(
-				'shortcode'	=> carbon_get_post_meta( $ad_id, 'mobile_shortcode'),
-				'height'	=> $height . 'px',
-				'margin'	=> $margin . 'px',
-				'body'		=> $body . 'px'
-			);
-		else :
-
-			$margin = absint( carbon_get_post_meta( $ad_id, 'desktop_margin') );
-			$height = absint( carbon_get_post_meta( $ad_id, 'desktop_size') );
-
-			if( 'header' === $type && is_admin_bar_showing()) :
-				$margin = $margin + 32;
-			endif;
-
-			if( 'footer' === $type ) :
-				$body = $height;
-			else :
-				$body = $height + $margin;
-			endif;
-
-			$ad = array(
-				'shortcode'	=> carbon_get_post_meta( $ad_id, 'desktop_shortcode'),
-				'height'	=> $height . 'px',
-				'margin'	=> $margin . 'px',
-				'body'		=> $body . 'px'
-			);
-		endif;
+		$ad = array(
+			'mobile'	=> carbon_get_post_meta( $ad_id, 'mobile_shortcode'),
+			'desktop'	=> carbon_get_post_meta( $ad_id, 'desktop_shortcode')
+		);
 
 		return $ad;
 	}
@@ -143,20 +102,10 @@ class Front {
 
 			$key = 'hfads_display';
 
-			if(isset($_COOKIE[$key])) :
-				$cookie = wp_parse_args(
-							maybe_unserialize(stripslashes_deep($_COOKIE[$key])),
-							$cookie
-						  );
-			endif;
-
 			$header_ad = absint(carbon_get_post_meta($post->ID, 'hfads_header'));
 			$footer_ad = absint(carbon_get_post_meta($post->ID, 'hfads_footer'));
 
-			if(
-				0 < $header_ad &&
-				false === $cookie['header']
-			) :
+			if( 0 < $header_ad ) :
 
 				$ad_setting = $this->get_ad( $header_ad );
 
@@ -166,10 +115,7 @@ class Front {
 
 			endif;
 
-			if(
-				0 < $footer_ad &&
-				false === $cookie['footer']
-			) :
+			if( 0 < $footer_ad ) :
 
 				$ad_setting = $this->get_ad( $footer_ad, 'footer' );
 
@@ -256,10 +202,17 @@ class Front {
 
 		global $post;
 
+		__debug($this->floating_ads);
+
 		if(array_key_exists('header', $this->floating_ads)) :
 			?>
 			<div class='hfads-header hfads-header-<?= $post->ID ; ?> hfads-holder' >
-				<?= do_shortcode( $this->floating_ads['header']['shortcode']); ?>
+				<div class='desktop-view'>
+					<?= do_shortcode( $this->floating_ads['header']['desktop']); ?>
+				</div>
+				<div class='mobile-view'>
+					<?= do_shortcode( $this->floating_ads['header']['mobile']); ?>
+				</div>
 				<a href='#' class='hfads-closing' data-target='header'>
 					<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAcklEQVQ4jc2SQQ6AIAwER1/A44SDPlNeJyZ6qQkhbT30oHuju2yXUvgTElCB7GiyaJJGVuACGlAUvgh3Abvl/ghGkzJwZsoFOER4ApvUWldbrctWNyuViz6J23l2TKaXs4nQE7SBaYNVEf7G8CKFV/kb3OR9P1Xog/cZAAAAAElFTkSuQmCC"/>
 				</a>
@@ -270,7 +223,12 @@ class Front {
 		if(array_key_exists('footer', $this->floating_ads)) :
 			?>
 			<div class='hfads-footer hfads-footer-<?= $post->ID ; ?> hfads-holder'>
-				<?= do_shortcode( $this->floating_ads['footer']['shortcode']); ?>
+				<div class='desktop-view'>
+					<?= do_shortcode( $this->floating_ads['footer']['desktop']); ?>
+				</div>
+				<div class='mobile-view'>
+					<?= do_shortcode( $this->floating_ads['footer']['mobile']); ?>
+				</div>
 				<a href='#' class='hfads-closing' data-target='footer'>
 					<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAcklEQVQ4jc2SQQ6AIAwER1/A44SDPlNeJyZ6qQkhbT30oHuju2yXUvgTElCB7GiyaJJGVuACGlAUvgh3Abvl/ghGkzJwZsoFOER4ApvUWldbrctWNyuViz6J23l2TKaXs4nQE7SBaYNVEf7G8CKFV/kb3OR9P1Xog/cZAAAAAElFTkSuQmCC"/>
 				</a>
